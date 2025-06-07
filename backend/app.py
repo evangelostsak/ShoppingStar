@@ -60,4 +60,34 @@ def load_user(user_id):
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     """Register a new User."""
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    
+    if request.method == 'GET':
+        return render_template('register.html')
+    
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        email = request.form.get('email')
+    if not username or not password or not email:
+        flash("All fields are required!", "error")
+        return redirect(url_for('register'))
+    
+    try:
+        message = data_manager.register(username, password, email)
+        if "already exists" in message:
+            flash(f"{message}", "error")
+            logger.warning(f"Registration failed: {message}")
+            return render_template("register.html")
+        
+        flash(f"{message}", "success")
+        logger.info(f"New user registered: {username}")
+        return redirect(url_for('login'))
+    
+    except Exception as e:
+        logger.error(f"Error during registration: {e}")
+        flash("Error while adding the user, please try again!", "error")
+        return render_template("register.html")
+        
     
