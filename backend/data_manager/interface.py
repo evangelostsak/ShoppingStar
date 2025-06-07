@@ -13,7 +13,7 @@ class DataManagerInterface(ABC):
         pass
 
     @abstractmethod
-    def register(self, username, password):
+    def register(self, username, password, email):
         """Save data to the database."""
         pass
 

@@ -42,13 +42,13 @@ class SQLiteDataManager(DataManagerInterface):
             return None
         
 
-    def register(self, username, password):
+    def register(self, username, password, email):
         """Register a new user."""
         try:
             existing_user = self.db.session.query(User).filter_by(username=username).first()
             if existing_user:
                 return f"User {username} already exists!"
-            new_user = User(username=username)
+            new_user = User(username=username, email=email)
             new_user.set_password(password)
             self.db.session.add(new_user)
             self.db.session.commit()
