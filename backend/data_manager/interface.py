@@ -53,6 +53,6 @@ class DataManagerInterface(ABC):
         pass
 
     @abstractmethod
-    def like_item(self, item_id, user_id):
+    def like_item(self, item_id):
         """Like an item."""
         pass
