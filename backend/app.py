@@ -89,5 +89,33 @@ def register():
         logger.error(f"Error during registration: {e}")
         flash("Error while adding the user, please try again!", "error")
         return render_template("register.html")
+    
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """Login an existing User."""
+    
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    
+    if request.method == 'GET':
+        return render_template('login.html')
+    
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+    correct_user = data_manager.authenticate_user(username=username, password=password)
+
+    if correct_user:
+        login_user(correct_user)
+        flash("Welcome back, {correct_user.username}!", "success")
+        logger.info(f"User logged in: {username}")
+        return redirect(url_for('home'))
+
+    else:
+        flash("Invalid username or password", "error")
+        logger.warning(f"Login failed for user: {username}")
+        return redirect(url_for('login'))
         
     
