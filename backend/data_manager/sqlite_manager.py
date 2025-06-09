@@ -1,5 +1,5 @@
-from data_manager.interface import DataManagerInterface
-from data_manager.models import User, Item, db
+from backend.data_manager.interface import DataManagerInterface
+from backend.data_manager.models import User, Item, db
 from sqlalchemy.exc import SQLAlchemyError
 
 class SQLiteDataManager(DataManagerInterface):

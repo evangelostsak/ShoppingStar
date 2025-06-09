@@ -1,7 +1,7 @@
 import os
 import logging
 from flask import Flask, request, render_template, redirect, flash, url_for
-from data_manager.sqlite_manager import SQLiteDataManager
+from backend.data_manager.sqlite_manager import SQLiteDataManager
 from dotenv import load_dotenv
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.exceptions import NotFound
