@@ -134,6 +134,22 @@ def logout():
     return render_template("logout.html")
 
 
+@app.route("/<user_id>/profile", methods=["GET"])
+@login_required
+def user_profile(user_id):
+    """Display Specific User's profile data."""
+
+    if int(current_user.id) != int(user_id):
+        flash("You can only view your own profile!", "error")
+        return redirect(url_for('home'))
+    
+    user = data_manager.get_user(user_id)
+    if not user:
+        raise NotFound
+    
+    return render_template("profile.html", user=user, user_id=user_id)
+    
+
 @app.route("/<user_id>/profile/update_user", methods=["GET", "POST"])
 @login_required
 def update_user(user_id):
