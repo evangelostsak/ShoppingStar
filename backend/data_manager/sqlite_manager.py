@@ -73,7 +73,7 @@ class SQLiteDataManager(DataManagerInterface):
         return None
     
 
-    def update_user(self, user_id, username, password, profile_picture):
+    def update_user(self, user_id, username, password, email, profile_picture):
         """Update existing User's data identified by ID."""
 
         try:
@@ -83,6 +83,8 @@ class SQLiteDataManager(DataManagerInterface):
             update_user.username = username
             if password:
                 update_user.set_password(password)
+            if email:
+                update_user.email = email
             if profile_picture:
                 update_user.profile_picture = profile_picture
             self.db.session.commit()
