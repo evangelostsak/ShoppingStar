@@ -93,7 +93,7 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    """Login an existing User."""
+    """Login route, Login a registered User."""
     
     if current_user.is_authenticated:
         return redirect(url_for('home'))
@@ -118,4 +118,24 @@ def login():
         logger.warning(f"Login failed for user: {username}")
         return redirect(url_for('login'))
         
+
+@app.route("/logout", methods=['GET', 'POST'])
+@login_required
+def logout():
+    """Logout route, Ending session for the current user."""
+
+    user = data_manager.get_user(current_user.id)
+    if request.method == "POST":
+        logout_user()
+        flash("You have been logged out.", "success")
+        logger.info(f"User logged out: {user.username}")
+        return redirect(url_for('login'))
+
+    return render_template("logout.html")
+
+
+@app.route("/", methods=["GET"])
+def home():
+    """Home route, home.html gets rendered"""
+    return render_template("home.html")
     
