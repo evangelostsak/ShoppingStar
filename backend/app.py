@@ -134,6 +134,88 @@ def logout():
     return render_template("logout.html")
 
 
+@app.route("/<user_id>/profile/update_user", methods=["GET", "POST"])
+@login_required
+def update_user(user_id):
+    """Update Specific User's profile data."""
+    
+    if int(current_user.id) != int(user_id):
+        flash("You can only update your own profile!", "error")
+        return redirect(url_for('home'))
+    user = data_manager.get_user(user_id)
+    if not user:
+        raise NotFound("User not found")        
+    
+    if request.method == "GET":
+        return render_template("update_user.html", user=user, user_id=user_id)
+    
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        email = request.form.get("email")
+        profile_picture = request.files.get("profile_picture")
+        remove_profile_picture = request.form.get("remove_profile_picture")
+        filename = None
+
+        try:
+            if remove_profile_picture:
+                filename = "default.png"
+            elif profile_picture and allowed_file(profile_picture.filename):
+                filename = secure_filename(profile_picture.filename)
+                file_path = os.path.join(os.getcwd(), app.config["UPLOAD_FOLDER"], filename)
+                profile_picture.save(file_path)
+
+            # Update  user details
+            update_details = data_manager.update_user(
+                user_id=user_id,
+                username=username if username else user.username,
+                password=password if password else user.password,
+                email=email if email else user.email,
+                profile_picture=filename if (profile_picture or remove_profile_picture) else user.profile_picture)
+            
+        except Exception as e:
+            flash(f"Error updating user, try that again!", "error")
+            return redirect(f"/{user_id}/profile/update_user")
+        
+        flash(f"{update_details}", "success")
+        logger.info(f"User details updated: {user.username}")
+        return redirect(f"/{user_id}/profile")
+    
+
+@app.route("/<user_id>/profile/delete_user", methods=["GET", "POST"])
+@login_required
+def delete_user(user_id):
+    """Delete Specific User's profile."""
+    if int(current_user.id) != int(user_id):
+        flash("You can only delete your own profile!", "error")
+        return redirect(url_for('home'))
+    user = data_manager.get_user(user_id)
+    if not user:
+        raise NotFound("User not found")
+    
+    if request.method == "GET":
+        return render_template("delete_user.html", user=user, user_id=user_id)
+    
+    if request.method == "POST":
+
+        try:
+            user_id = current_user.id
+            delete_user = data_manager.delete_user(user_id)
+
+            if not delete_user:
+                flash(f"User with ID {user_id} couldn't be found.", "error")
+                return redirect('home')
+            flash(f"User {user_id} deleted successfully!", "success")
+            logout_user()
+            logger.info(f"User deleted: {user.username}")
+            return redirect(url_for('login'))
+        
+        except Exception as e:
+            flash(f"Error deleting user, try that again!", "error")
+            logger.error(f"Error deleting user {user_id}: {e}")
+            return redirect(url_for('home'))
+
+
 @app.route("/", methods=["GET"])
 def home():
     """Home route, home.html gets rendered"""
