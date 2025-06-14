@@ -236,4 +236,16 @@ def delete_user(user_id):
 def home():
     """Home route, home.html gets rendered"""
     return render_template("home.html")
+
+
+@app.route("/items", methods=["GET"])
+def show_items():
+    """Items routes, show all items in the database"""
+
+    items = data_manager.get_all_items()
     
+    if not items:
+        flash("Something went wrong, no items found!", "error")
+        logger.error("No items found in the database.")
+        return redirect(url_for('home'))
+    return render_template("items.html", items=items)
