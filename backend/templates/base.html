@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Star</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <header>
+        <h1>Shopping Star</h1>
+        {% block pagename %}
+        {% endblock %}
+    </header>
+        <nav>
+        <a href="{{ url_for('home') }}">Home</a>
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('user_profile', user_id=current_user.id) }}">My Profile</a>
+        {% endif %}
+        <a href="{{ url_for('show_items') }}">Items</a>
+        {% if current_user.is_authenticated %}
+        <div class="user-dropdown">
+            <div class="user-info">
+                {% if current_user.profile_picture %}
+                    <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}" alt="Profile Picture" class="user-avatar">
+                {% else %}
+                    <img src="{{ url_for('static', filename='images/default_avatar.png') }}" alt="Default Avatar" class="user-avatar">
+                {% endif %}
+                <span class="user-name">{{ current_user.username }}</span>
+            </div>
+            <div class="dropdown-menu">
+                <p>You are logged in as <strong>{{ current_user.username }}</strong></p>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>
+    {% else %}
+        <a href="{{ url_for('register') }}">Register</a>
+        <a href="{{ url_for('login') }}">Login</a>
+    {% endif %}
+    </nav>
+
+    <div>
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages|length > 0 %}
+        {% for category, message in messages %}
+            <div class="flash-messages flash-{{ category }}">
+                <p>{{ message }}</p>
+            </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+
+
+        <footer>
+            <p>&copy; 2025 Shopping Star</p>
+        </footer>
+</body>
+</html>
